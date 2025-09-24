@@ -1,0 +1,62 @@
+-- Lua script para encontrar pontos em superfícies implícitas.
+
+local range = 3
+local step = 0.01
+local epsilon = 0.001
+
+-- Funções das equações
+function eq54(x, y, z)
+    return x*x + z*z - 1
+end
+
+function eq55(x, y, z)
+    return x + y*y - 3*z*z - 1
+end
+
+function eq53(x, y, z)
+    local radius_squared = x*x + y*y + z*z
+    if radius_squared <= 0 then
+        return math.huge
+    end
+    return 4 * math.log(radius_squared) - 1
+end
+
+function eq56(x, y, z)
+    return math.sin(x/2) - math.cos(y) * math.sqrt(x*x + z*z) - 2
+end
+
+-- Lista de equações para processar
+local equations = {
+    {"eq54", eq54},
+    {"eq55", eq55},
+    {"eq53", eq53},
+    {"eq56", eq56}
+}
+
+-- Função principal que gera os dados de uma única equação
+function generate_data(equation_name, equation_func)
+    -- Abre o arquivo de saída com o nome da equação
+    local file = io.open(equation_name .. ".csv", "w")
+    if not file then
+        error("Não foi possível criar o arquivo: " .. equation_name .. ".csv")
+    end
+
+    for x = -range, range, step do
+        for y = -range, range, step do
+            for z = -range, range, step do
+                local result = equation_func(x, y, z)
+                if math.abs(result) < epsilon then
+                    file:write(string.format("%.4f, %.4f, %.4f\n", x, y, z))
+                end
+            end
+        end
+    end
+
+    file:close()
+end
+
+-- Itera por todas as equações e gera os dados para cada uma
+for _, eq in ipairs(equations) do
+    local eq_name, eq_func = eq[1], eq[2]
+    generate_data(eq_name, eq_func)
+end

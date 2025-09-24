@@ -1,0 +1,97 @@
+import matplotlib as mpl
+mpl.use('TkAgg')
+
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import numpy as np
+import subprocess
+import os
+import sys
+
+# Nomes dos arquivos
+LUA_EXE_FILE = 'lua.exe'
+LUA_DLL_FILE = 'lua54.dll'
+SOLVER_SCRIPT = 'solver.lua'
+OUTPUT_CSV = 'pontos.csv'
+
+# Obtém o caminho base, que é a pasta temporária criada pelo PyInstaller.
+if getattr(sys, 'frozen', False):
+    base_path = sys._MEIPASS
+else:
+    base_path = os.path.dirname(os.path.abspath(__file__))
+
+def run_lua_script(equation_string):
+    """Executa o script Lua para gerar os dados da equação."""
+    print("Gerando dados da superfície com o script Lua...")
+    try:
+        lua_exe_path = os.path.abspath(LUA_EXE_FILE)
+        solver_script_path = os.path.join(base_path, SOLVER_SCRIPT)
+
+        # Verifica se os arquivos essenciais existem localmente
+        if not os.path.exists(lua_exe_path) or not os.path.exists(SOLVER_SCRIPT):
+            print(f"Erro: Arquivos essenciais ('{lua_exe_path}' ou '{SOLVER_SCRIPT}') não encontrados na pasta.")
+            return False
+
+        # Passa a equação como um argumento para o script Lua
+        subprocess.run([lua_exe_path, solver_script_path, equation_string], check=True)
+        
+        print("Dados gerados com sucesso.")
+        return True
+    except Exception as e:
+        print(f"Ocorreu um erro ao executar o script Lua: {e}")
+        return False
+
+def plot_and_save_views(equation_name):
+    """Lê os dados e plota o gráfico, salvando três visualizações."""
+    print(f"Plotando gráfico para a equação '{equation_name}'...")
+    try:
+        data = np.genfromtxt(OUTPUT_CSV, delimiter=',')
+
+        if data.ndim == 1 or data.shape[1] != 3:
+            print("Erro: O arquivo de dados não tem a forma esperada (3 colunas).")
+            return
+
+        x = data[:, 0]
+        y = data[:, 1]
+        z = data[:, 2]
+
+        views = [
+            ("XY", 90, 0),
+            ("XZ", 0, 90),
+            ("YZ", 0, 0)
+        ]
+
+        fig = plt.figure(figsize=(12, 10))
+        ax = fig.add_subplot(111, projection='3d')
+        ax.plot_trisurf(x, y, z, cmap='viridis', edgecolor='none', alpha=0.8)
+        ax.set_title(f'Gráfico 3D da Superfície: {equation_name}')
+        ax.set_xlabel('Eixo X')
+        ax.set_ylabel('Eixo Y')
+        ax.set_zlabel('Eixo Z')
+
+        for view_name, elev, azim in views:
+            ax.view_init(elev=elev, azim=azim)
+            filename = f'{equation_name}_view_{view_name}.png'
+            print(f"Salvando visualização {view_name} como '{filename}'...")
+            plt.savefig(filename, dpi=300)
+            print(f"Visualização salva com sucesso!")
+
+        ax.view_init(elev=30, azim=45)
+        print("Exibindo o gráfico...")
+        plt.show()
+
+    except FileNotFoundError:
+        print(f"Erro: O arquivo '{OUTPUT_CSV}' não foi encontrado.")
+    except Exception as e:
+        print(f"Ocorreu um erro durante a plotagem: {e}")
+
+if __name__ == "__main__":
+    # Pede a equação ao usuário
+    equation_input = input("Digite a equação (ex: x^2 + y^2 + z^2 - 1): ")
+    equation_string = f"return {equation_input}"
+    
+    # O nome do arquivo PNG agora será a equação, com '^' removido
+    png_name = equation_input.replace('^', '')
+
+    if run_lua_script(equation_string):
+        plot_and_save_views(png_name)
