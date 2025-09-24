@@ -9,3 +9,5 @@ shift + right click on the gitclone file open with powershell or console and wri
 
 pyinstaller main.py --name lambda --onefile --icon "icone.ico"
 
+OBS.: 
+The application text is in Portuguese, with no translations yet to be made soon (English and Spanish)
