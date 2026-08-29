@@ -1,6 +1,20 @@
-# Project Lambda
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/3e7d91be-64a4-47c0-a856-37902621231b" alt="Project Lambda Logo" width="200">
+</p>
 
-<img width="255" height="255" alt="icon" src="https://github.com/user-attachments/assets/3e7d91be-64a4-47c0-a856-37902621231b" />
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.14.2-blue.svg" alt="Python Version">
+  <img src="https://img.shields.io/badge/Status-In%20Development-orange.svg" alt="Status">
+  <img src="https://img.shields.io/badge/License-Open%20Source-green.svg" alt="License">
+</p>
+
+<p align="center">
+  <a href="#portugues">Português</a> •
+  <a href="#english">English</a> •
+  <a href="#espanol">Español</a>
+</p>
+
+# Project Lambda
 
 Project Lambda e um Sistema de Apoio Computacional educacional e de codigo aberto criado no Brasil para fins didaticos. O software foi projetado para auxiliar estudantes, professores e pesquisadores na resolucao, calculo e visualizacao grafica de topicos de Calculo I, Calculo II, Metodos Numericos e Logica Matematica.
 
